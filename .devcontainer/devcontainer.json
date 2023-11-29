@@ -29,6 +29,7 @@
 		"vscode": {
 			"settings": {},
 			"extensions": [
+				"mhutchie.git-graph",
 				"ms-python.flake8",
 				"ms-python.isort",
 				"ms-python.vscode-pylance",
