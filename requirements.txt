@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg2
+databases[aiosqlite]
+databases[asyncpg]
+python-dotenv
+pydantic-settings
+rich
+asgi-correlation-id
+python-json-logger
+python-jose
+python-multipart
+passlib[bcrypt]
+logtail-python
+sentry-sdk[fastaip]
