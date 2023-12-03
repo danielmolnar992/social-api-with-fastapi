@@ -1,6 +1,7 @@
 fastapi
 uvicorn[standard]
 sqlalchemy
+sqlalchemy-stubs
 psycopg2
 databases[aiosqlite]
 databases[asyncpg]

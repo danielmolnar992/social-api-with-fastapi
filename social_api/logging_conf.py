@@ -7,7 +7,7 @@ otherwise only from INFO.
 import logging
 from logging.config import dictConfig
 
-from social_api.config import DevConfig, config
+from social_api.config import DevConfig, ProdConfig, config
 
 
 def obfuscated(email: str, unobfuscated_length: int) -> str:
@@ -28,17 +28,19 @@ class EmailObfuscationFilter(logging.Filter):
 
     # If returns false, log record is filtered, when true, it is passed on
     def filter(self, record: logging.LogRecord) -> bool:
-        """Checks if the record contains an email address."""
+        """Checks if the record contains an email address and obfuscates
+        if present. Allows the LogRecord to go through either way."""
 
-        if 'email' in record.__dict__:
+        # if 'email' in record.__dict__:
+        if hasattr(record, 'email'):
             record.email = obfuscated(record.email, self.unobfuscated_length)
 
         return True
 
 
 # Only log to Logtail, if environment is prod
-handlers = ['default', 'rotating_file', 'logtail']
-if config.ENV_STATE == 'prod':
+handlers = ['default', 'rotating_file']
+if isinstance(config, ProdConfig):
     handlers.append('logtail')
 
 
@@ -67,6 +69,7 @@ def configure_logging() -> None:
                 'file': {
                     'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
                     'datefmt': '%Y-%m-%dT%H:%M:%S',
+                    # For JsonFormatter, the format string just defines what keys are included in the log record
                     'format': '%(asctime)s %(msecs)03d %(levelname)s %(correlation_id)s %(name)s %(lineno)d %(message)s',
                 }
             },
@@ -100,11 +103,11 @@ def configure_logging() -> None:
                 'social_api': {
                     'handlers': handlers,
                     # Only log from DEBUG level if in dev, otherwise from INFO
-                    'level': 'DEBUG' if isinstance(config, DevConfig) else 'INFO',
+                    'level': 'DEBUG' , #if isinstance(config, DevConfig) else 'INFO',
                     'propagate': False
                 },
                 'databases': {'handlers': ['default'], 'level': 'WARNING'},
-                'aiosqlite': {'handlers': ['default'], 'level': 'WARNING'},
+                'aiosqlite': {'handlers': ['default'], 'level': 'WARNING'}
             }
         }
     )

@@ -19,6 +19,7 @@ class GlobalConfig(BaseConfig):
     DB_FORCE_ROLL_BACK: bool = False
     LOGTAIL_API_KEY: Optional[str] = None
     SENTRY_DSN: Optional[str] = None
+    SECRET_KEY: Optional[str] = None
 
 
 class DevConfig(GlobalConfig):

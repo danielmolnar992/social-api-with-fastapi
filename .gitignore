@@ -6,6 +6,8 @@
 *.pyc
 __pycache__/
 .venv
+
+# Pytest
 .pytest_cache
 
 # MacOS
@@ -15,4 +17,4 @@ __pycache__/
 .env
 *.db
 *.png
-*.logs
+*.log
