@@ -42,6 +42,7 @@ class TestConfig(GlobalConfig):
 
     DATABASE_URL: str = "sqlite:///test.db"
     DB_FORCE_ROLL_BACK: bool = True
+    SECRET_KEY: str = 'TEST_SECRET_KEY'
 
     model_config = SettingsConfigDict(env_prefix='TEST_', extra='ignore')
 
