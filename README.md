@@ -1,6 +1,9 @@
 # Social API with FastAPI
 
-Add post, comments to post and get list of post and comments. This is a simple playground to play with FastAPI and other third party services.
+Add post, comments to their posts and query them.
+
+This is a simple playground to play with FastAPI and other third party services.
+- Python 3.12
 - Logtail for production logging
 - Sentry for crash reporting
 - Environment management (dev, test, prod) within `.env` file with an environment selector value
