@@ -31,6 +31,14 @@ users_table = sqlalchemy.Table(
     sqlalchemy.Column('password', sqlalchemy.String),
 )
 
+likes_table = sqlalchemy.Table(
+    'likes',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column('post_id', sqlalchemy.ForeignKey('posts.id'), nullable=False),
+    sqlalchemy.Column('user_id', sqlalchemy.ForeignKey('users.id'), nullable=False)
+)
+
 # check_same_thread only usable for SQLite
 connect_args = {'check_same_thread': False} if 'sqlite' in config.DATABASE_URL else {}
 engine = sqlalchemy.create_engine(

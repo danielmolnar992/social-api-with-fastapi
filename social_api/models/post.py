@@ -12,7 +12,7 @@ class UserPostIn(BaseModel):
 
 
 class UserPost(UserPostIn):
-    """User post with ID.
+    """User post with ID and user ID.
     From attribute true helps to check database return value attributes.
     Be default it checks return_value['something'], with this it
     also looks for return_value.something as well."""
@@ -20,6 +20,12 @@ class UserPost(UserPostIn):
     model_config = ConfigDict(from_attributes=True)
     id: int
     user_id: int
+
+
+class UserPostWithLikes(UserPost):
+    """User post with the count of likes assiociated."""
+
+    likes: int
 
 
 class CommentIn(BaseModel):
@@ -43,5 +49,18 @@ class Comment(CommentIn):
 class UserPostWithComments(BaseModel):
     """Post with its related comments."""
 
-    post: UserPost
+    post: UserPostWithLikes
     comments: list[Comment]
+
+
+class PostLikeIn(BaseModel):
+    """Incoming like data for posts."""
+
+    post_id: int
+
+
+class PostLike(PostLikeIn):
+    """Data of post likes."""
+
+    id: int
+    user_id: int
