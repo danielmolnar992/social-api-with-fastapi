@@ -13,13 +13,15 @@ from social_api.routers.post import router as post_router
 from social_api.routers.user import router as user_router
 
 
-sentry_sdk.init(
-    dsn=config.SENTRY_DSN,
-    traces_sample_rate=1.0,
-    profiles_sample_rate=1.0
-)
-
 logger = logging.getLogger(__name__)
+
+# Only enable Sentry if DSN is present
+if config.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=config.SENTRY_DSN,
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0
+    )
 
 
 @asynccontextmanager

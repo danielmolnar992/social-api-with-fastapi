@@ -1,3 +1,8 @@
+"""
+Configuring the dev, test and prod environments with Pydantic models based
+on the settings in the .env file.
+"""
+
 from functools import lru_cache
 from typing import Optional
 
