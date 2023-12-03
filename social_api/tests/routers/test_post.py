@@ -151,6 +151,7 @@ async def test_get_all_posts(async_client: AsyncClient, created_post: dict):
     [
         ('new', [2, 1]),
         ('old', [1, 2]),
+        ('most_likes', [2, 1]),
     ],
 )
 async def test_get_all_posts_sorting(
@@ -159,33 +160,17 @@ async def test_get_all_posts_sorting(
     sorting: str,
     expected_order: list[int],
 ):
-    """Tests retrieving all posts by new or old sorting order."""
+    """Tests retrieving all posts by sorting orders."""
 
     await create_post('Test Post 1', async_client, logged_in_token)
     await create_post('Test Post 2', async_client, logged_in_token)
+    await like_post(2, async_client, logged_in_token)
 
     response = await async_client.get('/post', params={'sorting': sorting})
     data = response.json()
 
     assert response.status_code == status.HTTP_200_OK
     assert [post['id'] for post in data] == expected_order
-
-
-@pytest.mark.anyio
-async def test_get_all_posts_sort_likes(
-    async_client: AsyncClient, logged_in_token: str
-):
-    """Tests retrieving all posts by most likes sorting order."""
-
-    await create_post('Test Post 1', async_client, logged_in_token)
-    await create_post('Test Post 2', async_client, logged_in_token)
-    await like_post(2, async_client, logged_in_token)
-
-    response = await async_client.get('/post', params={'sorting': 'most_likes'})
-    data = response.json()
-
-    assert response.status_code == status.HTTP_200_OK
-    assert [post['id'] for post in data] == [2, 1]
 
 
 @pytest.mark.anyio
