@@ -25,6 +25,8 @@ class GlobalConfig(BaseConfig):
     LOGTAIL_API_KEY: Optional[str] = None
     SENTRY_DSN: Optional[str] = None
     SECRET_KEY: Optional[str] = None
+    MAILGUN_API_KEY: Optional[str] = None
+    MAILGUN_DOMAIN: Optional[str] = None
 
 
 class DevConfig(GlobalConfig):
