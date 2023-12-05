@@ -4,10 +4,11 @@ Configuration and fixtures for the tests.
 
 import os
 from typing import AsyncGenerator, Generator
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 from fastapi.testclient import TestClient
-from httpx import AsyncClient
+from httpx import AsyncClient, Request, Response
 
 
 os.environ['ENV_STATE'] = 'test'
@@ -58,8 +59,35 @@ async def registered_user(async_client: AsyncClient) -> dict:
 
 
 @pytest.fixture()
-async def logged_in_token(async_client: AsyncClient, registered_user: dict):
+async def confirmed_user(registered_user: dict) -> dict:
+    """Confirms the registered user fixture and returns the user."""
+
+    query = (
+        users_table.update()
+        .where(users_table.c.email == registered_user['email'])
+        .values(confirmed=True)
+    )
+    await database.execute(query)
+    return registered_user
+
+
+@pytest.fixture()
+async def logged_in_token(async_client: AsyncClient, confirmed_user: dict):
     """Returns a valid access token for a registered and logged in user."""
 
-    response = await async_client.post('/token', json=registered_user)
+    response = await async_client.post('/token', json=confirmed_user)
     return response.json()['access_token']
+
+
+@pytest.fixture(autouse=True)
+def mock_httpx_client(mocker):
+    """Mocks the call to a third party API automatically for testing.
+    Returns the mocked async client for optional direct use."""
+
+    mocked_client = mocker.patch('social_api.tasks.httpx.AsyncClient')
+    mocked_async_client = Mock()
+    response = Response(status_code=200, content='', request=Request('POST', '//'))
+    mocked_async_client.post = AsyncMock(return_value=response)
+    mocked_client.return_value.__aenter__.return_value = mocked_async_client
+
+    return mocked_async_client

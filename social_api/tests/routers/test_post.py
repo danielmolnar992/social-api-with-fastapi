@@ -66,7 +66,7 @@ async def created_comment(
 
 @pytest.mark.anyio
 async def test_create_post(
-    async_client: AsyncClient, registered_user: dict, logged_in_token: str
+    async_client: AsyncClient, confirmed_user: dict, logged_in_token: str
 ):
     """Test post is created successfully."""
 
@@ -81,19 +81,19 @@ async def test_create_post(
     assert {
         'id': 1,
         'body': 'Test Post',
-        'user_id': registered_user['id']
+        'user_id': confirmed_user['id']
     }.items() <= response.json().items()
 
 
 @pytest.mark.anyio
 async def test_create_post_expired_token(
-    async_client: AsyncClient, registered_user: dict, mocker
+    async_client: AsyncClient, confirmed_user: dict, mocker
 ):
-    """Tests if expied token returns 401 when trying to post. Patched token
+    """Test if expied token returns 401 when trying to post. Patched token
     expiration ensures the token is expored by the time test uses it."""
 
     mocker.patch('social_api.security.access_token_expire_minutes', return_value=-1)
-    token = security.create_access_token(registered_user['email'])
+    token = security.create_access_token(confirmed_user['email'])
 
     response = await async_client.post(
         '/post',
@@ -124,7 +124,7 @@ async def test_create_post_missing_data(
 async def test_like_post(
     async_client: AsyncClient, created_post: dict, logged_in_token: str
 ):
-    """Tests if liking the post successfully"""
+    """Test if liking the post successfully"""
 
     response = await async_client.post(
         '/like',
@@ -160,7 +160,7 @@ async def test_get_all_posts_sorting(
     sorting: str,
     expected_order: list[int],
 ):
-    """Tests retrieving all posts by sorting orders."""
+    """Test retrieving all posts by sorting orders."""
 
     await create_post('Test Post 1', async_client, logged_in_token)
     await create_post('Test Post 2', async_client, logged_in_token)
@@ -175,7 +175,7 @@ async def test_get_all_posts_sorting(
 
 @pytest.mark.anyio
 async def test_get_all_post_wrong_sorting(async_client: AsyncClient):
-    """Tests retrieving all posts by a non existing sorting order."""
+    """Test retrieving all posts by a non existing sorting order."""
 
     response = await async_client.get('/post', params={'sorting': 'wrong'})
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -183,9 +183,9 @@ async def test_get_all_post_wrong_sorting(async_client: AsyncClient):
 
 @pytest.mark.anyio
 async def test_create_comment(
-    async_client: AsyncClient, created_post: dict, registered_user: dict, logged_in_token: str
+    async_client: AsyncClient, created_post: dict, confirmed_user: dict, logged_in_token: str
 ):
-    """Tests successful comment creation."""
+    """Test successful comment creation."""
 
     body = 'Test Comment'
 
@@ -200,7 +200,7 @@ async def test_create_comment(
         'id': 1,
         'body': body,
         'post_id': created_post['id'],
-        'user_id': registered_user['id']
+        'user_id': confirmed_user['id']
     }.items() <= response.json().items()
 
 
@@ -208,7 +208,7 @@ async def test_create_comment(
 async def test_get_comments_on_post(
     async_client: AsyncClient, created_post: dict, created_comment: dict
 ):
-    """Tests successfully retrieving comments on post."""
+    """Test successfully retrieving comments on post."""
 
     response = await async_client.get(f'/post/{created_post['id']}/comments')
     assert response.status_code == status.HTTP_200_OK
@@ -219,7 +219,7 @@ async def test_get_comments_on_post(
 async def test_get_comments_on_post_empty(
     async_client: AsyncClient, created_post: dict
 ):
-    """Tests successfully retrieving comments on empty post successfully."""
+    """Test successfully retrieving comments on empty post successfully."""
 
     response = await async_client.get(f'/post/{created_post['id']}/comments')
     assert response.status_code == status.HTTP_200_OK
@@ -231,7 +231,7 @@ async def test_get_comments_on_post_empty(
 async def test_get_post_with_comments(
     async_client: AsyncClient, created_post: dict, created_comment: dict
 ):
-    """Tests retrieving post with its comment successfully."""
+    """Test retrieving post with its comment successfully."""
 
     response = await async_client.get(f'/post/{created_post['id']}')
     assert response.status_code == status.HTTP_200_OK
@@ -245,7 +245,7 @@ async def test_get_post_with_comments(
 async def test_get_missing_post_with_comments(
     async_client: AsyncClient, created_post: dict, created_comment: dict
 ):
-    """Tests if retrieving missing post returns HTTP 404."""
+    """Test if retrieving missing post returns HTTP 404."""
 
     response = await async_client.get('/post/2')
     assert response.status_code == status.HTTP_404_NOT_FOUND
