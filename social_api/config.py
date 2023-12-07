@@ -28,6 +28,11 @@ class GlobalConfig(BaseConfig):
     MAILGUN_API_KEY: Optional[str] = None
     MAILGUN_DOMAIN: Optional[str] = None
 
+    GCP_BUCKET_NAME: Optional[str] = None
+    GCP_PROJECT_ID: Optional[str] = None
+    GCP_SERVICE_ACCOUNT: Optional[str] = None
+    GCP_SA_KEY_PATH: Optional[str] = None
+
 
 class DevConfig(GlobalConfig):
     """Config used for development."""

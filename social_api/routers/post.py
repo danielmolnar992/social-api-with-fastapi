@@ -1,3 +1,7 @@
+"""
+Router to handle posts, comments and likes.
+"""
+
 import logging
 from enum import Enum
 from typing import Annotated

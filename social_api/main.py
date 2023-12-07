@@ -10,6 +10,7 @@ from social_api.config import config
 from social_api.database import database
 from social_api.logging_conf import configure_logging
 from social_api.routers.post import router as post_router
+from social_api.routers.upload import router as upload_router
 from social_api.routers.user import router as user_router
 
 
@@ -38,6 +39,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(CorrelationIdMiddleware)
 app.include_router(post_router)
+app.include_router(upload_router)
 app.include_router(user_router)
 
 

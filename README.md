@@ -25,6 +25,9 @@ This is a simple playground to play with FastAPI and other third party services.
 - Get a list of post with likes (with specified order): `GET /post`
 - Get comments of a post: `GET /post/{post_id}/comments`
 - Get post with it's comments: `GET /post/{post_id}`
+- Upload files to storage bucket: `POST /upload`
+
+Postman collection is available in the `postman_collection` folder.
 
 ## Useful commands
 
