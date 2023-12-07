@@ -2,3 +2,4 @@ pytest
 httpx
 pytest-mock
 flake8
+pyfakefs  # fs fixture for pytest cases

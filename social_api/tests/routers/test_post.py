@@ -1,6 +1,11 @@
+"""
+Tests for the post router.
+"""
+
 import pytest
 from fastapi import status
 from httpx import AsyncClient
+from pytest_mock import MockerFixture
 
 from social_api import security
 
@@ -87,7 +92,7 @@ async def test_create_post(
 
 @pytest.mark.anyio
 async def test_create_post_expired_token(
-    async_client: AsyncClient, confirmed_user: dict, mocker
+    async_client: AsyncClient, confirmed_user: dict, mocker: MockerFixture
 ):
     """Test if expied token returns 401 when trying to post. Patched token
     expiration ensures the token is expored by the time test uses it."""

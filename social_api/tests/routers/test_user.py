@@ -1,6 +1,11 @@
+"""
+Tests for the user router.
+"""
+
 import pytest
 from fastapi import BackgroundTasks, status
 from httpx import AsyncClient
+from pytest_mock import MockerFixture, MockFixture
 
 from social_api import tasks
 
@@ -41,7 +46,7 @@ async def test_register_user_already_exists(
 
 
 @pytest.mark.anyio
-async def test_confirm_user(async_client: AsyncClient, mocker):
+async def test_confirm_user(async_client: AsyncClient, mocker: MockerFixture):
     """Test successful user confirmation."""
 
     spy = mocker.spy(BackgroundTasks, 'add_task')
@@ -63,7 +68,7 @@ async def test_confirm_user_invalid_token(async_client: AsyncClient):
 
 
 @pytest.mark.anyio
-async def test_confirm_user_expired_token(async_client: AsyncClient, mocker):
+async def test_confirm_user_expired_token(async_client: AsyncClient, mocker: MockerFixture):
     """Test failed user confirmation with expired token."""
 
     mocker.patch('social_api.security.confirm_token_expire_minutes', return_value=-1)

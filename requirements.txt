@@ -15,3 +15,5 @@ python-multipart
 passlib[bcrypt]
 logtail-python
 sentry-sdk[fastaip]
+google-cloud-storage
+aiofiles

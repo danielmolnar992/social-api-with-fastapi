@@ -18,3 +18,5 @@ __pycache__/
 *.db
 *.png
 *.log
+sa-*.json
+local_*.py

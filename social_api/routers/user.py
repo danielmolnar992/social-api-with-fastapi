@@ -1,3 +1,7 @@
+"""
+Router to handle user registration and authentication.
+"""
+
 import logging
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Request, status
