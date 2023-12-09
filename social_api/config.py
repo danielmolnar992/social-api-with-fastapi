@@ -22,16 +22,19 @@ class GlobalConfig(BaseConfig):
 
     DATABASE_URL: str
     DB_FORCE_ROLL_BACK: bool = False
+
     LOGTAIL_API_KEY: Optional[str] = None
     SENTRY_DSN: Optional[str] = None
     SECRET_KEY: Optional[str] = None
+
     MAILGUN_API_KEY: Optional[str] = None
     MAILGUN_DOMAIN: Optional[str] = None
 
     GCP_BUCKET_NAME: Optional[str] = None
     GCP_PROJECT_ID: Optional[str] = None
-    GCP_SERVICE_ACCOUNT: Optional[str] = None
     GCP_SA_KEY_PATH: Optional[str] = None
+
+    DEEPAI_API_KEY: Optional[str] = None
 
 
 class DevConfig(GlobalConfig):

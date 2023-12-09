@@ -11,7 +11,8 @@ posts_table = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column('body', sqlalchemy.String),
-    sqlalchemy.Column('user_id', sqlalchemy.ForeignKey('users.id'), nullable=False)
+    sqlalchemy.Column('user_id', sqlalchemy.ForeignKey('users.id'), nullable=False),
+    sqlalchemy.Column('image_url', sqlalchemy.String)
 )
 
 comments_table = sqlalchemy.Table(

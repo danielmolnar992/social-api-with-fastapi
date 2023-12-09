@@ -7,14 +7,17 @@ from enum import Enum
 from typing import Annotated
 
 import sqlalchemy
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import (APIRouter, BackgroundTasks, Depends, HTTPException,
+                     Request, status)
 
 from social_api.database import (comments_table, database, likes_table,
                                  posts_table)
 from social_api.models.post import (Comment, CommentIn, PostLike, PostLikeIn,
                                     UserPost, UserPostIn, UserPostWithComments,
                                     UserPostWithLikes)
+from social_api.models.user import User
 from social_api.security import get_current_user
+from social_api.tasks import generate_and_add_to_post
 
 
 router = APIRouter()
@@ -41,7 +44,11 @@ async def find_post(post_id: int):
 
 @router.post('/post', response_model=UserPost, status_code=status.HTTP_201_CREATED)
 async def create_post(
-    post: UserPostIn, current_user: Annotated[str, Depends(get_current_user)]
+    post: UserPostIn,  # Pydantic model -> expected as the body
+    current_user: Annotated[User, Depends(get_current_user)],
+    background_task: BackgroundTasks,
+    request: Request,
+    prompt: str = None  # str -> expected in the query string arguments
 ):
     """Create a new post from user input and auto-incremented ID. Requires a
     logged in user (with the injected dependency of currenc_user)."""
@@ -52,6 +59,16 @@ async def create_post(
     query = posts_table.insert().values(data)
     logger.debug(query)
     last_record_id = await database.execute(query)
+
+    if prompt:
+        background_task.add_task(
+            generate_and_add_to_post,
+            current_user.email,
+            last_record_id,
+            request.url_for('get_post_with_comments', post_id=last_record_id),
+            database,
+            prompt
+        )
 
     return {**data, 'id': last_record_id}
 
@@ -86,7 +103,7 @@ async def list_posts(sorting: PostSorting = PostSorting.NEW):
 
 @router.post('/comment', response_model=Comment, status_code=status.HTTP_201_CREATED)
 async def create_comment(
-    comment: CommentIn, current_user: Annotated[str, Depends(get_current_user)]
+    comment: CommentIn, current_user: Annotated[User, Depends(get_current_user)]
 ):
     """Create a new post from user input and auto-incremented ID. Requires
     a logged in user (with the injected dependency of current_user)."""
@@ -140,7 +157,7 @@ async def get_post_with_comments(post_id: int):
 @router.post('/like', response_model=PostLike, status_code=status.HTTP_201_CREATED)
 async def like_post(
     like: PostLikeIn,
-    current_user: Annotated[str, Depends(get_current_user)]
+    current_user: Annotated[User, Depends(get_current_user)]
 ):
     """Records a like to a post by an authenticated user."""
 
