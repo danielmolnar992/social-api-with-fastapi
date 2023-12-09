@@ -8,46 +8,17 @@ from httpx import AsyncClient
 from pytest_mock import MockerFixture
 
 from social_api import security
+from social_api.tests.helpers import create_comment, create_post, like_post
 
 
-async def create_post(
-    body: str, async_client: AsyncClient, logged_in_token: str
-) -> dict:
-    """Creates a post with the given body."""
+@pytest.fixture()
+def mock_generate_cute_creature_api(mocker: MockerFixture):
+    """Mocks the creation of image for the post."""
 
-    response = await async_client.post(
-        '/post',
-        json={'body': body},
-        headers={'Authorization': f'Bearer {logged_in_token}'}
+    return mocker.patch(
+        'social_api.tasks._generate_cute_creature_api',
+        return_value={'output_url': 'http://example.net/image.jpg'},
     )
-    return response.json()
-
-
-async def create_comment(
-    body: str, post_id: int, async_client: AsyncClient, logged_in_token: str
-) -> dict:
-    """Creates a comment with the given body and post ID. Requires a post
-    to be present."""
-
-    response = await async_client.post(
-        '/comment',
-        json={'body': body, 'post_id': post_id},
-        headers={'Authorization': f'Bearer {logged_in_token}'}
-    )
-    return response.json()
-
-
-async def like_post(
-    post_id: int, async_client: AsyncClient, logged_in_token: str
-) -> dict:
-    """Likes a post. Requires the post to be present."""
-
-    response = await async_client.post(
-        '/like',
-        json={'post_id': post_id},
-        headers={'Authorization': f'Bearer {logged_in_token}'}
-    )
-    return response.json()
 
 
 @pytest.fixture()
@@ -86,7 +57,8 @@ async def test_create_post(
     assert {
         'id': 1,
         'body': 'Test Post',
-        'user_id': confirmed_user['id']
+        'user_id': confirmed_user['id'],
+        'image_url': None
     }.items() <= response.json().items()
 
 
@@ -123,6 +95,26 @@ async def test_create_post_missing_data(
     )
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.anyio
+async def test_create_post_with_prompt(
+    async_client: AsyncClient, logged_in_token: str, mock_generate_cute_creature_api
+):
+    """Test create post with prompt successfully."""
+
+    response = await async_client.post(
+        '/post?prompt=A cat',
+        json={'body': 'Test Post'},
+        headers={'Authorization': f'Bearer {logged_in_token}'},
+    )
+    assert response.status_code == 201
+    assert {
+        'id': 1,
+        'body': 'Test Post',
+        'image_url': None,
+    }.items() <= response.json().items()
+    mock_generate_cute_creature_api.assert_called()
 
 
 @pytest.mark.anyio

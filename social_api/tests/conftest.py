@@ -9,11 +9,13 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from fastapi.testclient import TestClient
 from httpx import AsyncClient, Request, Response
+from pytest_mock import MockerFixture
 
 
 os.environ['ENV_STATE'] = 'test'
-from social_api.database import database, users_table  # noqa E402
-from social_api.main import app  # noqa E402
+from social_api.database import database, users_table
+from social_api.main import app
+from social_api.tests.helpers import create_post
 
 
 @pytest.fixture(scope='session')
@@ -34,8 +36,9 @@ async def db() -> AsyncGenerator:
     """Runs for every test case and since roll back is set to true,
     it will clear the changes."""
 
+    # Without connecting, the force rollback True setting won't take effect.
     await database.connect()
-    yield
+    yield database
     await database.disconnect()
 
 
@@ -80,7 +83,7 @@ async def logged_in_token(async_client: AsyncClient, confirmed_user: dict):
 
 
 @pytest.fixture(autouse=True)
-def mock_httpx_client(mocker):
+def mock_httpx_client(mocker: MockerFixture):
     """Mocks the call to a third party API automatically for testing.
     Returns the mocked async client for optional direct use."""
 
@@ -91,3 +94,10 @@ def mock_httpx_client(mocker):
     mocked_client.return_value.__aenter__.return_value = mocked_async_client
 
     return mocked_async_client
+
+
+@pytest.fixture()
+async def created_post(async_client: AsyncClient, logged_in_token: str):
+    """Fixture for a post created by the time the test runs."""
+
+    return await create_post('Test post', async_client, logged_in_token)
