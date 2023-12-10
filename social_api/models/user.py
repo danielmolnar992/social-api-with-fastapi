@@ -1,4 +1,4 @@
-""""
+"""
 Define the user related models.
 """
 

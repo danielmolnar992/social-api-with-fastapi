@@ -1,5 +1,5 @@
 """
-Router to handle posts, comments and likes.
+Router to handle posts, comments, likes and image prompt.
 """
 
 import logging

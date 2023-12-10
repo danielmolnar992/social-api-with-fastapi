@@ -1,3 +1,7 @@
+"""
+Defines the FastAPI app and it's routers.
+"""
+
 import logging
 from contextlib import asynccontextmanager
 
@@ -16,7 +20,7 @@ from social_api.routers.user import router as user_router
 
 logger = logging.getLogger(__name__)
 
-# Only enable Sentry if DSN is present
+# Only enable Sentry if DSN is present in env/config
 if config.SENTRY_DSN:
     sentry_sdk.init(
         dsn=config.SENTRY_DSN,
