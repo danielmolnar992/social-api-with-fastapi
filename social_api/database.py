@@ -1,3 +1,7 @@
+"""
+Database configuration and setup focusing on SQLite and PostgrSQL.
+"""
+
 import databases
 import sqlalchemy
 

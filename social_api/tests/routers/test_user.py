@@ -5,9 +5,7 @@ Tests for the user router.
 import pytest
 from fastapi import BackgroundTasks, status
 from httpx import AsyncClient
-from pytest_mock import MockerFixture, MockFixture
-
-from social_api import tasks
+from pytest_mock import MockerFixture
 
 
 async def register_user(async_client: AsyncClient, email: str, password: str):

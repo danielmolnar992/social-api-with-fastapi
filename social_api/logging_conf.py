@@ -103,7 +103,7 @@ def configure_logging() -> None:
                 'social_api': {
                     'handlers': handlers,
                     # Only log from DEBUG level if in dev, otherwise from INFO
-                    'level': 'DEBUG' , #if isinstance(config, DevConfig) else 'INFO',
+                    'level': 'DEBUG',  # if isinstance(config, DevConfig) else 'INFO',
                     'propagate': False
                 },
                 'databases': {'handlers': ['default'], 'level': 'WARNING'},

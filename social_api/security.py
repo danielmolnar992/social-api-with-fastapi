@@ -1,3 +1,8 @@
+"""
+Security setup to handle password encryption and decreption, user
+authentication, token creation and information retrieval.
+"""
+
 import datetime
 import logging
 from typing import Annotated, Literal

@@ -1,3 +1,8 @@
+"""
+Tasks to send emails and generate images with DeepAI. They are used in
+background tasks to reduce response time of the API.
+"""
+
 import logging
 from json import JSONDecodeError
 
@@ -14,6 +19,7 @@ logger = logging.getLogger(__name__)
 class APIResponseError(Exception):
     """Custom exception for errors in Mailgun API call."""
     pass
+
 
 async def send_simple_email(to: str, subject: str, body: str):
     """Send a simple emial with a subject and a body defined."""
