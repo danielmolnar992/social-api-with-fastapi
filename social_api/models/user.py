@@ -10,9 +10,16 @@ class User(BaseModel):
 
     id: int | None = None
     email: str
+    username: str
 
 
 class UserIn(User):
     """User with sensitive information."""
 
     password: str
+
+
+class UserConfirmed(UserIn):
+    """User with confirmation info."""
+
+    confirmed: bool

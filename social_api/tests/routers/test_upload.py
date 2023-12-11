@@ -18,7 +18,7 @@ from pytest_mock import MockerFixture
 def sample_image(fs: FakeFilesystem) -> pathlib.Path:
     """Add a sample image to the fake filesystem"""
 
-    path = (pathlib.Path(__file__).parent / 'assets' / 'myfile.png').resolve()
+    path = (pathlib.Path(__file__).parent / "assets" / "myfile.png").resolve()
     fs.create_file(path)
 
     return path
@@ -30,8 +30,8 @@ def mock_upload_file_to_bucket(mocker: MockerFixture):
     Applied automatically."""
 
     return mocker.patch(
-        'social_api.routers.upload.upload_file_to_bucket',
-        return_value='https://fakeurl.com'
+        "social_api.routers.upload.upload_file_to_bucket",
+        return_value="https://fakeurl.com",
     )
 
 
@@ -46,9 +46,8 @@ def aiofiles_mock_open(mocker: MockerFixture, fs: FakeFilesystem):
     mock_open = mocker.patch("aiofiles.open")
 
     @contextlib.asynccontextmanager
-    async def async_file_open(fname: str, mode: str = 'r'):
-
-        out_fs_mock = mocker.AsyncMock(name=f'async_file_open:{fname!r}/{mode!r}')
+    async def async_file_open(fname: str, mode: str = "r"):
+        out_fs_mock = mocker.AsyncMock(name=f"async_file_open:{fname!r}/{mode!r}")
         with open(fname, mode) as fin:
             out_fs_mock.read.side_effect = fin.read
             out_fs_mock.write.side_effect = fin.write
@@ -67,9 +66,9 @@ async def call_upload_endpoint(
     image."""
 
     return await async_client.post(
-        '/upload',
-        files={'file': open(sample_image, 'rb')},
-        headers={'Authorization': f'Bearer {token}'}
+        "/upload",
+        files={"file": open(sample_image, "rb")},
+        headers={"Authorization": f"Bearer {token}"},
     )
 
 
@@ -82,7 +81,7 @@ async def test_upload_image(
     response = await call_upload_endpoint(async_client, logged_in_token, sample_image)
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json()['file_url'] == 'https://fakeurl.com'
+    assert response.json()["file_url"] == "https://fakeurl.com"
 
 
 @pytest.mark.anyio
@@ -90,12 +89,12 @@ async def test_temp_file_removed_after_upload(
     async_client: AsyncClient,
     logged_in_token: str,
     sample_image: pathlib.Path,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ):
     """Test if the temp file is deleted after upload finished."""
 
     # Spy on the NamedTemporaryFile function
-    named_temp_file_spy = mocker.spy(tempfile, 'NamedTemporaryFile')
+    named_temp_file_spy = mocker.spy(tempfile, "NamedTemporaryFile")
 
     response = await call_upload_endpoint(async_client, logged_in_token, sample_image)
     assert response.status_code == status.HTTP_201_CREATED

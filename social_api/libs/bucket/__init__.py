@@ -19,7 +19,7 @@ def client_authentication():
     """Authenticate the service account. Not expected to change during
     runtime, thus the value is cached."""
 
-    logger.debug('Authorizing Service account to GCP')
+    logger.debug("Authorizing Service account to GCP")
     client = storage.Client.from_service_account_json(config.GCP_SA_KEY_PATH)
 
     return client
@@ -40,11 +40,11 @@ def upload_file_to_bucket(local_file: str, file_name: str):
     client = client_authentication()
     bucket = get_storage_bucket(client)
 
-    logger.debug(f'Uploading {local_file} to GCS as {file_name}')
+    logger.debug(f"Uploading {local_file} to GCS as {file_name}")
     blob = bucket.blob(file_name)
     blob.upload_from_filename(local_file)
 
     download_url = blob.public_url
-    logger.debug(f'Uploaded {local_file} and got download URL: {download_url}')
+    logger.debug(f"Uploaded {local_file} and got download URL: {download_url}")
 
     return download_url
