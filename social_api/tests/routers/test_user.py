@@ -32,13 +32,47 @@ async def test_register_user(async_client: AsyncClient):
 async def test_register_user_already_exists(
     async_client: AsyncClient, registered_user: dict
 ):
-    """Test a user registration when user already exists."""
+    """Test a user registration when user (username and email) already exists."""
 
     response = await register_user(
         async_client,
         registered_user["username"],
-        registered_user["email"],
+        "test2@example.com",
         registered_user["password"],
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "already exists" in response.json()["detail"]
+
+
+@pytest.mark.anyio
+async def test_register_email_already_exists(
+    async_client: AsyncClient, registered_user: dict
+):
+    """Test a user registration when user (username and email) already exists."""
+
+    response = await register_user(
+        async_client,
+        registered_user["username"],
+        "test2@example.com",
+        "12345",
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "already exists" in response.json()["detail"]
+
+
+@pytest.mark.anyio
+async def test_register_username_already_exists(
+    async_client: AsyncClient, registered_user: dict
+):
+    """Test a user registration when user (username and email) already exists."""
+
+    response = await register_user(
+        async_client,
+        "testuser2",
+        registered_user["email"],
+        "12345",
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
