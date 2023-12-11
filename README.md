@@ -9,6 +9,7 @@ This is a simple playground to play with FastAPI and other third party services.
 - Environment management (dev, test, prod) within `.env` file with an environment selector value
 - Pytest for testing
 - Flake8 for linting
+- Black and isort for formatting
 - Async database management with SQLAlchemy and Databases. Libraries added for SQLite and PostgreSQL.
 - Github Actions for continuous integrations
 - Dev Container for development
@@ -30,7 +31,17 @@ This is a simple playground to play with FastAPI and other third party services.
 - Upload files to storage bucket: `POST /upload`
 
 Fast API documenation endpoint: `/docs`
-Postman collection is available in the `postman_collection` folder.
+
+## User data
+
+Registration:
+- username: must be unique
+- email: must be unique (used in JWT `sub`)
+- password
+
+Login (with `OAuth2PasswordBearer`):
+- username
+- password
 
 ## Useful commands
 
