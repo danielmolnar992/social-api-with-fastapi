@@ -14,13 +14,14 @@ from passlib.context import CryptContext
 
 from social_api.config import config
 from social_api.database import database, users_table
+from social_api.models.user import UserConfirmed
 
 
 logger = logging.getLogger(__name__)
-pwd_context = CryptContext(schemes=['bcrypt'])
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
+pwd_context = CryptContext(schemes=["bcrypt"])
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 SECRET_KEY = config.SECRET_KEY
-ALGORITHM = 'HS256'
+ALGORITHM = "HS256"
 
 
 def create_credentials_exception(detail: str):
@@ -29,7 +30,7 @@ def create_credentials_exception(detail: str):
     return HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail=detail,
-        headers={'WWW-Authenticate': 'Bearer'}
+        headers={"WWW-Authenticate": "Bearer"},
     )
 
 
@@ -46,11 +47,11 @@ def confirm_token_expire_minutes() -> int:
 def create_access_token(email: str):
     """Create JWT token based on the email address."""
 
-    logger.debug('Creating access token', extra={'email': email})
+    logger.debug("Creating access token", extra={"email": email})
     expire = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
         minutes=access_token_expire_minutes()
     )
-    jwt_data = {'sub': email, 'exp': expire, 'type': 'access'}
+    jwt_data = {"sub": email, "exp": expire, "type": "access"}
     encoded_jwt = jwt.encode(jwt_data, key=SECRET_KEY, algorithm=ALGORITHM)
 
     return encoded_jwt
@@ -59,38 +60,36 @@ def create_access_token(email: str):
 def create_confirmation_token(email: str):
     """Create JWT token based on the email address."""
 
-    logger.debug('Creating confirmation token', extra={'email': email})
+    logger.debug("Creating confirmation token", extra={"email": email})
     expire = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
         minutes=confirm_token_expire_minutes()
     )
-    jwt_data = {'sub': email, 'exp': expire, 'type': 'confirmation'}
+    jwt_data = {"sub": email, "exp": expire, "type": "confirmation"}
     encoded_jwt = jwt.encode(jwt_data, key=SECRET_KEY, algorithm=ALGORITHM)
 
     return encoded_jwt
 
 
-def get_subject_for_token_type(
-    token: str, exp_type: Literal['access', 'confirmation']
-):
+def get_subject_for_token_type(token: str, exp_type: Literal["access", "confirmation"]):
     """Gets the subject value from the given token type or raises an error."""
 
     try:
         payload = jwt.decode(token, key=SECRET_KEY, algorithms=[ALGORITHM])
 
     except ExpiredSignatureError as e:
-        raise create_credentials_exception('Token has expired') from e
+        raise create_credentials_exception("Token has expired") from e
 
     except JWTError as e:
-        raise create_credentials_exception('Invalid token') from e
+        raise create_credentials_exception("Invalid token") from e
 
-    email = payload.get('sub')
+    email = payload.get("sub")
     if not email:
         raise create_credentials_exception('Token is missing "sub" field')
 
-    token_type = payload.get('type')
+    token_type = payload.get("type")
     if token_type != exp_type:
         raise create_credentials_exception(
-            f'Token has incorrect type, expected {exp_type}'
+            f"Token has incorrect type, expected {exp_type}"
         )
 
     return email
@@ -106,10 +105,10 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-async def get_user(email: str):
-    """Returns the user if exists, else None."""
+async def get_user_by_email(email: str) -> UserConfirmed | None:
+    """Returns the user by email if exists, else None."""
 
-    logger.debug('Fetching user from database', extra={'email': email})
+    logger.debug("Fetching user from database", extra={"email": email})
     query = users_table.select().where(users_table.c.email == email)
     result = await database.fetch_one(query)
 
@@ -117,20 +116,31 @@ async def get_user(email: str):
         return result
 
 
-async def authenticate_user(email: str, password: str):
+async def get_user_by_username(username: str) -> UserConfirmed | None:
+    """Returns the user by usename if exists, else None."""
+
+    logger.debug("Fetching user from database", extra={"username": username})
+    query = users_table.select().where(users_table.c.username == username)
+    result = await database.fetch_one(query)
+
+    if result:
+        return result
+
+
+async def authenticate_user(username: str, password: str):
     """Checks if user exists, password is correct and returns the user.
     Raises an HTTPException when user doesn't exists or password is
     incorrect."""
 
-    logger.debug('Authenticating user', extra={'email': email})
-    user = await get_user(email)
+    logger.debug("Authenticating user", extra={"username": username})
+    user = await get_user_by_username(username)
 
     if not user:
-        raise create_credentials_exception('Invalid emial or password')
+        raise create_credentials_exception("Invalid emial or password")
     if not verify_password(password, user.password):
-        raise create_credentials_exception('Invalid emial or password')
+        raise create_credentials_exception("Invalid emial or password")
     if not user.confirmed:
-        raise create_credentials_exception('User has not confirmed email')
+        raise create_credentials_exception("User has not confirmed email")
 
     return user
 
@@ -139,9 +149,9 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     """Returns the current user based on the token or raises an error.
     OAuth2PasswordBearer dependency is injected."""
 
-    email = get_subject_for_token_type(token, 'access')
-    user = await get_user(email=email)
+    email = get_subject_for_token_type(token, "access")
+    user = await get_user_by_email(email=email)
     if not user:
-        raise create_credentials_exception('Could not find user for this token')
+        raise create_credentials_exception("Could not find user for this token")
 
     return user

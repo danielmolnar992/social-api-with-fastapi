@@ -11,9 +11,9 @@ async def create_post(
     """Creates a post with the given body."""
 
     response = await async_client.post(
-        '/post',
-        json={'body': body},
-        headers={'Authorization': f'Bearer {logged_in_token}'}
+        "/post",
+        json={"body": body},
+        headers={"Authorization": f"Bearer {logged_in_token}"},
     )
     return response.json()
 
@@ -25,9 +25,9 @@ async def create_comment(
     to be present."""
 
     response = await async_client.post(
-        '/comment',
-        json={'body': body, 'post_id': post_id},
-        headers={'Authorization': f'Bearer {logged_in_token}'}
+        "/comment",
+        json={"body": body, "post_id": post_id},
+        headers={"Authorization": f"Bearer {logged_in_token}"},
     )
     return response.json()
 
@@ -38,8 +38,8 @@ async def like_post(
     """Likes a post. Requires the post to be present."""
 
     response = await async_client.post(
-        '/like',
-        json={'post_id': post_id},
-        headers={'Authorization': f'Bearer {logged_in_token}'}
+        "/like",
+        json={"post_id": post_id},
+        headers={"Authorization": f"Bearer {logged_in_token}"},
     )
     return response.json()

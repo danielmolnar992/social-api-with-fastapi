@@ -23,9 +23,7 @@ logger = logging.getLogger(__name__)
 # Only enable Sentry if DSN is present in env/config
 if config.SENTRY_DSN:
     sentry_sdk.init(
-        dsn=config.SENTRY_DSN,
-        traces_sample_rate=1.0,
-        profiles_sample_rate=1.0
+        dsn=config.SENTRY_DSN, traces_sample_rate=1.0, profiles_sample_rate=1.0
     )
 
 
@@ -51,11 +49,11 @@ app.include_router(user_router)
 async def http_exception_handler_logging(request: Request, exc: HTTPException):
     """Adds unified logging to HTTP exception handler."""
 
-    logger.error(f'HTTPException: {exc.status_code} {exc.detail}')
+    logger.error(f"HTTPException: {exc.status_code} {exc.detail}")
     return await http_exception_handler(request, exc)
 
 
-@app.get('/sentry-debug')
+@app.get("/sentry-debug")
 async def trigger_error():
     """Trigger an error to test Sentry."""
 
