@@ -1,0 +1,22 @@
+# IDEA
+.vscode/
+.idea/
+
+# Python
+*.pyc
+__pycache__/
+.venv
+
+# Pytest
+.pytest_cache
+
+# MacOS
+.DS_Store
+
+# Local files
+.env
+*.db
+*.png
+*.log
+sa-*.json
+local_*.py
