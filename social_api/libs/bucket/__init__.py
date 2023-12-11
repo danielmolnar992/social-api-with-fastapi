@@ -19,7 +19,7 @@ def client_authentication():
     """Authenticate the service account. Not expected to change during
     runtime, thus the value is cached."""
 
-    logger.debug("Authorizing Service account to GCP")
+    logger.debug("Authorizing Service Account to GCP GCS")
     client = storage.Client.from_service_account_json(config.GCP_SA_KEY_PATH)
 
     return client
@@ -28,7 +28,8 @@ def client_authentication():
 @lru_cache()
 def get_storage_bucket(client: storage.Client):
     """Returns the storage bucket. Not expected to change during runtime,
-    thus the value is cached."""
+    thus the value is cached. In a more complex setup, this should contain
+    the logic which bucket to return."""
 
     return client.bucket(config.GCP_BUCKET_NAME)
 
@@ -48,3 +49,11 @@ def upload_file_to_bucket(local_file: str, file_name: str):
     logger.debug(f"Uploaded {local_file} and got download URL: {download_url}")
 
     return download_url
+
+
+def close_bucket_client():
+    """Closes the storage bucket client."""
+
+    logger.debug("Closing transport to GCS.")
+    client = client_authentication()
+    client.close()

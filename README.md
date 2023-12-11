@@ -1,6 +1,6 @@
 # Social API with FastAPI
 
-Add post, comments to their posts and query them.
+An API with FastAPI to register users, create posts with comments, likes and AI generated images based on a prompt. Images can be uploaded to a cloud bucket.
 
 This is a simple playground to play with FastAPI and other third party services.
 - Python 3.12
