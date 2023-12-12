@@ -2,14 +2,14 @@
 Define the user related models.
 """
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class User(BaseModel):
     """User model without sensitive information."""
 
     id: int | None = None
-    email: str
+    email: EmailStr
     username: str
 
 
