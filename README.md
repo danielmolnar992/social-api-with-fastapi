@@ -22,6 +22,7 @@ This is a simple playground to play with FastAPI and other third party services.
 - Register a user and get a confirmation email: `POST /register`
 - Login and get an access token: `POST /token`
 - Email confirmation: `GET /confirm/{token}`
+- Trigger email reconfirmation: `POST /reconfirm`
 - Create a post (with optional prompt): `POST /post`
 - Create a comment: `POST /comment`
 - Like a post: `POST /like`
@@ -58,5 +59,5 @@ uvicorn social_api.main:app --reload
 
 Run pytest
 ```bash
-pytest && flake8
+pytest -W ignore::DeprecationWarning && flake8
 ```

@@ -19,6 +19,7 @@ from social_api.security import (
     get_subject_for_token_type,
     get_user_by_email,
     get_user_by_username,
+    verify_password,
 )
 
 
@@ -41,16 +42,17 @@ async def register(user: UserIn, background_task: BackgroundTasks, request: Requ
         username=user.username, email=user.email, password=hashed_password
     )
     logger.debug(query)
+    await database.execute(query)
 
     # Using background task not to minimize registration response time
     background_task.add_task(
         tasks.send_user_registration_email,
+        user.username,
         user.email,
         confirmation_url=request.url_for(
             "confirm_email", token=create_confirmation_token(user.email)
         ),
     )
-    await database.execute(query)
 
     return {"detail": "User created. Please confirm your email."}
 
@@ -63,6 +65,49 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     access_token = create_access_token(user.email)
 
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post("/reconfirm")
+async def trigger_registration_reconfirmation(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    background_task: BackgroundTasks,
+    request: Request,
+):
+    """Triggers an email user confirmation when user is registered but not confirmed."""
+
+    user = await get_user_by_username(form_data.username)
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect username or password",
+        )
+
+    if not verify_password(form_data.password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect username or password",
+        )
+
+    # Sets confirmation to False, even if it was confirmed before
+    query = (
+        users_table.update()
+        .where(users_table.c.username == user.username)
+        .values(confirmed=False)
+    )
+    logger.debug(query)
+    await database.execute(query)
+
+    background_task.add_task(
+        tasks.send_user_registration_email,
+        user.username,
+        user.email,
+        confirmation_url=request.url_for(
+            "confirm_email", token=create_confirmation_token(user.email)
+        ),
+    )
+
+    return {"detail": "Reconfirmation initiated. Please check your emails."}
 
 
 @router.get("/confirm/{token}")

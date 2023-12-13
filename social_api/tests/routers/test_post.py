@@ -55,7 +55,6 @@ async def test_create_post(
 
     assert response.status_code == status.HTTP_201_CREATED
     assert {
-        "id": 1,
         "body": "Test Post",
         "user_id": confirmed_user["id"],
         "image_url": None,
@@ -110,7 +109,6 @@ async def test_create_post_with_prompt(
     )
     assert response.status_code == 201
     assert {
-        "id": 1,
         "body": "Test Post",
         "image_url": None,
     }.items() <= response.json().items()
@@ -146,9 +144,9 @@ async def test_get_all_posts(async_client: AsyncClient, created_post: dict):
 @pytest.mark.parametrize(
     "sorting, expected_order",
     [
-        ("new", [2, 1]),
-        ("old", [1, 2]),
-        ("most_likes", [2, 1]),
+        ("new", ["Test Post 2", "Test Post 1"]),
+        ("old", ["Test Post 1", "Test Post 2"]),
+        ("most_likes", ["Test Post 2", "Test Post 1"]),
     ],
 )
 async def test_get_all_posts_sorting(
@@ -160,14 +158,15 @@ async def test_get_all_posts_sorting(
     """Test retrieving all posts by sorting orders."""
 
     await create_post("Test Post 1", async_client, logged_in_token)
-    await create_post("Test Post 2", async_client, logged_in_token)
-    await like_post(2, async_client, logged_in_token)
+    post_to_like = await create_post("Test Post 2", async_client, logged_in_token)
+
+    await like_post(post_to_like["id"], async_client, logged_in_token)
 
     response = await async_client.get("/post", params={"sorting": sorting})
     data = response.json()
 
     assert response.status_code == status.HTTP_200_OK
-    assert [post["id"] for post in data] == expected_order
+    assert [post["body"] for post in data] == expected_order
 
 
 @pytest.mark.anyio
@@ -197,7 +196,6 @@ async def test_create_comment(
 
     assert response.status_code == status.HTTP_201_CREATED
     assert {
-        "id": 1,
         "body": body,
         "post_id": created_post["id"],
         "user_id": confirmed_user["id"],

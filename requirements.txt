@@ -16,3 +16,4 @@ logtail-python==0.2.7
 sentry-sdk[fastaip]==1.38.0
 google-cloud-storage==2.13.0
 aiofiles==23.2.1
+pydantic[email]==2.5.2
