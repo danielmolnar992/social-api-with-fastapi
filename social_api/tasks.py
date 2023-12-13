@@ -53,7 +53,9 @@ async def send_simple_email(to: str, subject: str, body: str):
         return response
 
 
-async def send_user_registration_email(username: str, email: str, confirmation_url: str):
+async def send_user_registration_email(
+    username: str, email: str, confirmation_url: str
+):
     """Sends a precompile email for registration"""
 
     return await send_simple_email(
@@ -97,7 +99,12 @@ async def _generate_cute_creature_api(prompt: str):
 
 
 async def generate_and_add_to_post(
-    username: str, email: str, post_id: int, post_url: str, database: Database, prompt: str
+    username: str,
+    email: str,
+    post_id: int,
+    post_url: str,
+    database: Database,
+    prompt: str,
 ):
     """Generates an image to the post and sends an email to the usre with
     the URL."""
