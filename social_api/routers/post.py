@@ -69,6 +69,7 @@ async def create_post(
     if prompt:
         background_task.add_task(
             generate_and_add_to_post,
+            current_user.username,
             current_user.email,
             last_record_id,
             request.url_for("get_post_with_comments", post_id=last_record_id),

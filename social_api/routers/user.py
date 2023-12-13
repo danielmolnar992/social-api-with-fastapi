@@ -47,6 +47,7 @@ async def register(user: UserIn, background_task: BackgroundTasks, request: Requ
     # Using background task not to minimize registration response time
     background_task.add_task(
         tasks.send_user_registration_email,
+        user.username,
         user.email,
         confirmation_url=request.url_for(
             "confirm_email", token=create_confirmation_token(user.email)
@@ -99,6 +100,7 @@ async def trigger_registration_reconfirmation(
 
     background_task.add_task(
         tasks.send_user_registration_email,
+        user.username,
         user.email,
         confirmation_url=request.url_for(
             "confirm_email", token=create_confirmation_token(user.email)
