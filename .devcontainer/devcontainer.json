@@ -12,8 +12,6 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "pip3 install --user -r requirements.txt"
-	// "postCreateCommand": "pip install -r requirements.txt",
 	"postCreateCommand": [
 		"pip install -r requirements.txt",
 		"pip install -r requirements-dev.txt"
@@ -33,7 +31,6 @@
 				"ms-python.flake8",
 				"ms-python.isort",
 				"ms-python.vscode-pylance",
-				"ms-python.pylint",
 				"ms-python.python",
 				"postman.postman-for-vscode"
 			]
