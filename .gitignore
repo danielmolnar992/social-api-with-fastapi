@@ -20,3 +20,6 @@ __pycache__/
 *.log
 sa-*.json
 local_*.py
+
+# Conda
+environment.yml
