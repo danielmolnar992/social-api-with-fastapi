@@ -4,6 +4,7 @@
 	"name": "Social API with FastAPI",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "python:3.12-bullseye",
+	"runArgs": ["--name", "social-api-with-fastapi"],
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
